@@ -1,6 +1,10 @@
 <html>
 <head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
 <script>
 
 function preenche_criaturas(){
@@ -1791,37 +1795,46 @@ var foodlists={
 		Magmasaur: ['Ambergris'],
 		RockDrake: ['Nameless Venom']
 	}
+	
+	
+
+
 </script>
 
 <style>
 
-	h6{
-		margin: 2px;
-		margin-block-start: 2px;
-		margin-block-end: 2px;
+	.ui-selectmenu.ui-popup .ui-input-search {
+	    margin-left: .5em;
+	    margin-right: .5em;
+	}
+	.ui-selectmenu.ui-dialog .ui-content {
+	    padding-top: 0;
+	}
+	.ui-selectmenu.ui-dialog .ui-selectmenu-list {
+	    margin-top: 0;
+	}
+	.ui-selectmenu.ui-popup .ui-selectmenu-list li.ui-first-child .ui-btn {
+	    border-top-width: 1px;
+	    -webkit-border-radius: 0;
+	    border-radius: 0;
+	}
+	.ui-selectmenu.ui-dialog .ui-header {
+	    border-bottom-width: 1px;
 	}
 
 </style>
 </head>
 <body>
-<select id="lista_criaturas" style="width:300px"></select>
-<br><br>
-<a href="#" onclick="b_tempo_incubacao();">Tempo de Incubação</a>
-<br><br>
-<a href="#" onclick="b_tempo_crescimento();">Tempo de Crescimento</a>
-<br><br>
-<a href="#" onclick="b_tempo_bebe();">Tempo de Bebe</a>
-<br><br>
-<br><br>
-<label style="display: block;width:200px">Percentual de Crescimento</label><input type="number" id="percentual_crescimento" value="0" style="display: block;width:200px" /><br>
-<label style="display: block;width:200px">Minutos</label><input type="number" id="tempo" value="0" style="display: block;width:200px" /><br>
-<label style="display: block;width:200px">Horas</label><input type="number" id="horas" value="1" style="display: block;width:200px" /><br>
-<label style="display: block;width:200px">Quantidade de Criaturas</label><input type="number" id="quantidade" value="1" style="display: block;width:200px" />
-<br><br>
-<a href="#" onclick="b_comida_intervalo_tempo()">Comida</a>
-<br><br>
-<a href="#" onclick="$('#log').empty()">Limpar</a>
-<br><br>
+<select id="lista_criaturas" data-native-menu="false">  </select>
+<a href="#" class="ui-btn ui-corner-all" onclick="b_tempo_incubacao();">Tempo de Incubação</a>
+<a href="#" class="ui-btn ui-corner-all" onclick="b_tempo_crescimento();">Tempo de Crescimento</a>
+<a href="#" class="ui-btn ui-corner-all" onclick="b_tempo_bebe();">Tempo de Bebe</a>
+<label>Percentual de Crescimento</label><input type="number" id="percentual_crescimento" value="0"  /><br>
+<label>Minutos</label><input type="number" id="tempo" value="0"  /><br>
+<label>Horas</label><input type="number" id="horas" value="1"  /><br>
+<label>Quantidade de Criaturas</label><input type="number" id="quantidade" value="1" />
+<a href="#" class="ui-btn ui-corner-all" onclick="b_comida_intervalo_tempo()">Comida</a>
+<a href="#" class="ui-btn ui-corner-all" onclick="$('#log').empty()">Limpar</a>
 <h2 id="log"><h2>
 </body>
 </html>
