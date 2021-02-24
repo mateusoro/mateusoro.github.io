@@ -3,7 +3,7 @@
 <title>Ark</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.7.min.js"></script>
 <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
 <script>
@@ -17,8 +17,16 @@ function preenche_criaturas(){
 		$('<option>').val(c).text(c).appendTo('#lista_criaturas');
 	
 	}
+	$("#lista_criaturas").selectmenu('refresh');
+	//alert('Carregado');
 	
 }
+$(window).load(function() {
+ 
+ preenche_criaturas();
+
+});
+
 function b_tempo_incubacao(){
 	
 	var cri = $( "#lista_criaturas option:selected" ).text();
@@ -57,14 +65,7 @@ function b_comida_intervalo_tempo(){
 			
 }
 
-$( document ).ready(function() {
-    preenche_criaturas();
-	
-	
-	
-	
-	
-});
+
 
 
 
@@ -1826,7 +1827,7 @@ var foodlists={
 </style>
 </head>
 	<body>
-	  <div data-role="page"> 
+	  <div id="myPage" data-role="page"> 
 		<div role="main" class="ui-content">
 			<select id="lista_criaturas" data-native-menu="false">  </select>
 			<a href="#" class="ui-btn ui-corner-all" onclick="b_tempo_incubacao();">Tempo de Incubação</a>
