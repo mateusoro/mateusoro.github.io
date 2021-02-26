@@ -31,24 +31,25 @@ function b_tempo_incubacao(){
 	
 	var cri = $( "#lista_criaturas option:selected" ).text();
 	var t = tempo_incubacao(cri);	
+	var l = $('<li>');
 	
-	$('<li>').text("Tempo de Incubação "+cri+": "+convertNumToTime(t/60/60)+"("+Math.ceil(t/60)+"min) ").appendTo('#log');
+	$('<label style="margin: 10px;">').text("Tempo de Incubação "+cri+": "+convertNumToTime(t/60/60)+"("+Math.ceil(t/60)+"min) ").appendTo(l).appendTo('#log');
 		
 }
 function b_tempo_crescimento(){
 	
 	var cri = $( "#lista_criaturas option:selected" ).text();
 	var t = tempo_crescimento(cri);	
-	
-	$('<li>').text("Tempo de Crescimento "+cri+": "+convertNumToTime(t/60/60)+"("+Math.ceil(t/60)+"min) ").appendTo('#log');
+	var l = $('<li>');
+	$('<label style="margin: 10px;">').text("Tempo de Crescimento "+cri+": "+convertNumToTime(t/60/60)+"("+Math.ceil(t/60)+"min) ").appendTo(l).appendTo('#log');
 		
 }
 function b_tempo_bebe(){
 	
 	var cri = $( "#lista_criaturas option:selected" ).text();
 	var t = tempo_bebe(cri);	
-	
-	$('<li> class="ui-li-static ui-body-inherit"').text("Tempo de Bebe "+cri+": "+convertNumToTime(t/60/60)+"("+Math.ceil(t/60)+"min) ").appendTo('#log');
+	var l = $('<li>');
+	$('<label style="margin: 10px;">').text("Tempo de Bebe "+cri+": "+convertNumToTime(t/60/60)+"("+Math.ceil(t/60)+"min) ").appendTo(l).appendTo('#log');
 		
 }
 function b_comida_intervalo_tempo(){
@@ -58,8 +59,20 @@ function b_comida_intervalo_tempo(){
 	var ret = comida_intervalo_tempo(cri, $('#percentual_crescimento').val(), $('#tempo').val()*60+$('#horas').val()*60*60, $('#quantidade').val());
 	
 	for (var r in ret){
+		var l = $('<li>');
+		$('<label style="margin: 10px;">').text(r+":"+ret[r]).appendTo(l).appendTo('#log');		
 		
-		$('<li>').text(r+":"+ret[r]).appendTo('#log');		
+	}
+			
+}
+function b_status(){
+	
+	var cri = $( "#lista_criaturas option:selected" ).text();
+	var ret = status(cri, $("#hp").val(),$("#energia").val(),$("#peso").val(),$("#dano").val());
+	
+	for (var r in ret){
+		var l = $('<li>');
+		$('<label style="margin: 10px;">').text(r+":"+ret[r]).appendTo(l).appendTo('#log');		
 		
 	}
 			
@@ -70,7 +83,7 @@ function b_comida_intervalo_tempo(){
 
 
 
-varBaseminfoodrate = 0.000155;
+var Baseminfoodrate = 0.000155;
 function tempo_incubacao(criatura){
 	var c = creatures[criatura];
 	if(c.gestationspeed){
@@ -101,7 +114,7 @@ function comida_bebe(criatura){
 	var c = creatures[criatura];	
 	
 	var maxfoodrate=c.basefoodrate*c.babyfoodrate*c.extrababyfoodrate;
-	var minfoodrate=baseminfoodrate*c.babyfoodrate*c.extrababyfoodrate;
+	var minfoodrate= Baseminfoodrate*c.babyfoodrate*c.extrababyfoodrate;
 	
 	var foodratedecay=(maxfoodrate-minfoodrate)/tempo_crescimento(criatura);
 	
@@ -118,7 +131,7 @@ function comida_intervalo(criatura, percentual_crescimento, tempo, quantidade){
 	var c = creatures[criatura];	
 	
 	var maxfoodrate=c.basefoodrate*c.babyfoodrate*c.extrababyfoodrate*quantidade;
-	var minfoodrate=baseminfoodrate*c.babyfoodrate*c.extrababyfoodrate*quantidade;
+	var minfoodrate=Baseminfoodrate*c.babyfoodrate*c.extrababyfoodrate*quantidade;
 	
 	var foodratedecay=(maxfoodrate-minfoodrate)/tempo_crescimento(criatura);
 	var tempo_atual = tempo_crescimento(criatura)*(percentual_crescimento/100);
@@ -1808,19 +1821,19 @@ function status(criatura, hp, energia, peso, dano){
 	var s_energia = Math.ceil((energia-s["EnergiaBase"].replace(',','.') )/s["EnergiaSelva"].replace(',','.'));
 	var s_peso = Math.ceil((peso-s["PesoBase"].replace(',','.') )/s["PesoSelva"].replace(',','.'));
 	var s_dano = Math.ceil((dano-s["DanoBase"].replace(',','.') )/s["DanoSelva"].replace(',','.'));
+	
+	var r = {
+		"HP":s_hp,
+		"Energia":s_energia,
+		"Peso":s_peso,
+		"Dano":s_dano
+	}
 	console.log(s);
-	console.log(s_hp, s_energia, s_peso,s_dano);
-	return [s_hp, s_energia, s_peso,s_dano];
+	console.log(r);
+	return r;
 	
 }
-function b_status(){
-	
-	var cri = $( "#lista_criaturas option:selected" ).text();
-	var r = status(cri, $("#hp").val(),$("#energia").val(),$("#peso").val(),$("#dano").val())
-	$('<li>').text(r).appendTo('#log');		
-	
-	
-}
+
 
 </script>
 
