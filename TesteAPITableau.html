@@ -29,6 +29,14 @@
 
         <script type="text/javascript">
 
+			$.urlParam = function(name){
+				var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+				if (results==null) {
+				   return null;
+				}
+				return decodeURI(results[1]) || 0;
+			}
+
             $.fn.dataTable.ext.errMode = 'none';
             var viz, sheet, table;
             var dados;
@@ -37,10 +45,11 @@
             var tb, tb2;
             var data, data2;
             var ultimo_ano, ultimo_mes;
-			var ano_atual_global = 2022;
-            var mes = ["Janeiro"]
+			var ano_atual_global = $.urlParam('ano');
+            var mes = $.urlParam('mes')
+			var uf = $.urlParam('UF');
             //var mes = ["Janeiro"]
-            var contador = 0;
+           
 			var tabela = [];
             
             
@@ -49,8 +58,8 @@
                 var containerDiv = document.getElementById("vizContainer"),
                 url = "https://public.tableau.com/views/TempodeAberturadeEmpresas_15877424223640/PorEstado",
                 options = {
-                    "sig_uf (municipio_ibge.csv)": "SC",
-                    "mes_deferimento": mes[contador],
+                    "sig_uf (municipio_ibge.csv)": uf,
+                    "mes_deferimento": mes,
                     "ano_deferimento": ano_atual_global,
                     onFirstInteractive: function () {
                         getData();
@@ -65,7 +74,7 @@
 					}
                     
                 }
-                $("#log").text("Carregando " + mes[contador] + "/" + ano_atual_global);
+                $("#log").text("Carregando " + mes + "/" + ano_atual_global);
                 viz = new tableau.Viz(containerDiv, url, options);
 
             }
@@ -74,7 +83,7 @@
             function getData() {
 
                 sheet = viz.getWorkbook().getActiveSheet().getWorksheets().get("Total por Municipio - Menores");
-                console.log(1);
+                
                 options = {
                     maxRows: 0, // Max rows to return. Use 0 to return all rows
                     ignoreAliases: false,
@@ -84,16 +93,20 @@
                 
                 try {
                     sheet.getUnderlyingDataAsync(options).then(function (t) {
-                        console.log(3.1);
+                       
                         table = t;
                         tb = $("#tb");
                         tb2 = $("#tb2");
 
-                        console.log(3);
+                        
                         dados = table.getData();
+						$("#vizContainer").hide();
+						$("#log").hide();
+						
+						var cont = 0;
 						var cabecalho = ["ID", "Ano","Cidade","UF","UF", "N", "Mês","Região","Tipo","Qtd", "T1","T2","T3","T4","T5","T6","T7","Qtd2" ];
 						for(var d of dados){
-							
+							cont ++;
 							var linha = [];	
 							for(var x = 0; x < 18; x++){
 							
@@ -102,8 +115,10 @@
 							}		
 							tabela.push(linha);
 						}
+						console.log(cont);
+						
 						$('#tabelas').DataTable({
-							data: tabela, 
+							data: tabela,
 							paging: false,
 							columns: [
 								{ title: 'ID' },
@@ -135,7 +150,7 @@
                 } catch (e) {
                     console.log('erro', e);
                 }
-                console.log('foi');
+               
             }
 			
 			function convertToCSV(arr) {
@@ -165,15 +180,8 @@
         <div class="page-header">           
             <h5 id="log" style="margin: 10px;" >Iniciando...</h5>
         </div>
-        <div style="margin: 10px;" id="vizContainer" style="width:800px; height:500px;"></div>
-        <div id="t1" style="margin: 10px; display: none">       
-            <h5>Tempo Médio Total</h5>
-            <table id="tb" class="table table-striped table-bordered" style="width:100%"></table>
-        </div> 
-        <div id="t2" style="margin: 10px; display: none">       
-            <h5>Tempo Médio de Viabilidade</h5>
-            <table id="tb2" class="table table-striped table-bordered" style="width:100%"></table>
-        </div> 
+        <div style="margin: 10px;" id="vizContainer" style="width:800px; height:0px; display: none;"></div>
+       
 		<table id="tabelas" class="display" width="100%"></table>
     </body>
 </html>
