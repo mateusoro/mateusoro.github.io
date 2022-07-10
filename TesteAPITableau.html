@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Teste API</title>
+        <title>API Tableau</title>
 		<script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">  
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">  
@@ -50,22 +50,22 @@
 			var uf = $.urlParam('UF');
             //var mes = ["Janeiro"]
            
-			var tabela = [];
-            
+			
+            var work;
             
             function initViz() {              
 
                 var containerDiv = document.getElementById("vizContainer"),
                 url = "https://public.tableau.com/views/TempodeAberturadeEmpresas_15877424223640/PorEstado",
+				//views/MapadeEmpresasnoBrasil_15877433181480/VisoGeral?:language=pt-BR&UF=SC&nom_municipio=Anchieta&:display_count=n&:origin=viz_share_link
                 options = {
-                    "sig_uf (municipio_ibge.csv)": uf,
                     "mes_deferimento": mes,
                     "ano_deferimento": ano_atual_global,
                     onFirstInteractive: function () {
                         getData();
                     }
                 };
-				console.log(options);
+				
                 if (viz) {
 					try{
 						viz.dispose();
@@ -74,104 +74,91 @@
 					}
                     
                 }
-                $("#log").text("Carregando " + mes + "/" + ano_atual_global);
+                
                 viz = new tableau.Viz(containerDiv, url, options);
 
             }
             
 
             function getData() {
-
-                sheet = viz.getWorkbook().getActiveSheet().getWorksheets().get("Total por Municipio - Menores");
-                
-                options = {
+				
+				work = viz.getWorkbook().getActiveSheet().getWorksheets();
+				
+				
+				options = {
                     maxRows: 0, // Max rows to return. Use 0 to return all rows
                     ignoreAliases: false,
                     ignoreSelection: true,
                     includeAllColumns: false
                 };
-                
-                try {
-                    sheet.getUnderlyingDataAsync(options).then(function (t) {
-                       
-                        table = t;
-                        tb = $("#tb");
-                        tb2 = $("#tb2");
-
-                        
-                        dados = table.getData();
-						$("#vizContainer").hide();
-						$("#log").hide();
+				
+				
+				//for(var sheet of work){
+				
+					try {
+					
+						sheet = work.get("Tempo Médio de Abertura");
+					
+						sheet.getUnderlyingDataAsync(options).then(function (t) {
+						   
+							table = t;
+							tb = $("#tb");
+							tb2 = $("#tb2");
+							var tabela = [];
+							
+							var dados1 = t.getData();
+							$("#vizContainer").hide();
+							$("#log").hide();
+							
+							var cont = 0;
+							
+							var cabecalho = [];
+							
+							for(var d of dados1){
+								
+								if(cont==0){
+								
+									for(var k of Object.keys(d)){
+									
+										cabecalho.push({ title: k });
+									
+									}
+								}
+								cont ++;
+								var linha = [];	
+								for(var x = 0; x < cabecalho.length; x++){
+								
+									linha.push(d[x].value);						
+								
+								}		
+								tabela.push(linha);
+							}
+							console.log(cont);
+							var tt = $('<table class="display" width="100%">');
+							$('body').append(tt);
+							
+							
+							tt.DataTable({
+								data: tabela,
+								paging: false,
+								columns: cabecalho,							
+							});
 						
-						var cont = 0;
-						var cabecalho = ["ID", "Ano","Cidade","UF","UF", "N", "Mês","Região","Tipo","Qtd", "T1","T2","T3","T4","T5","T6","T7","Qtd2" ];
-						for(var d of dados){
-							cont ++;
-							var linha = [];	
-							for(var x = 0; x < 18; x++){
-							
-								linha.push(d[x].value);						
-							
-							}		
-							tabela.push(linha);
+						  
+						}),
+						function (err) {
+							console.log('erro', err);
 						}
-						console.log(cont);
-						
-						$('#tabelas').DataTable({
-							data: tabela,
-							paging: false,
-							columns: [
-								{ title: 'ID' },
-								{ title: 'Ano' },
-								{ title: 'Cidade' },
-								{ title: 'UF' },
-								{ title: 'UF' },
-								{ title: 'N' },
-								{ title: 'Mês' },
-								{ title: 'Região' },
-								{ title: 'Tipo' },
-								{ title: 'Qtd' },
-								{ title: 'T1' },
-								{ title: 'T2' },
-								{ title: 'T3' },
-								{ title: 'T4' },
-								{ title: 'T5' },
-								{ title: 'T6' },
-								{ title: 'T7' },
-								{ title: 'Qtd2' }
-							],							
-						});
-						//downloadCSV(convertToCSV(tabela));
-                      
-                    }),
-                    function (err) {
-                        console.log('erro', err);
-                    }
-                } catch (e) {
-                    console.log('erro', e);
-                }
+					} catch (e) {
+						console.log('erro', e);
+					}
+				
+				//}                              
+                
                
             }
 			
-			function convertToCSV(arr) {
-			  const array = [Object.keys(arr[0])].concat(arr)
-
-			  return array.map(it => {
-				return Object.values(it).toString()
-			  }).join('\n')
-			}
-
-
-			function downloadCSV(dados) {  
-			
-				  var myBlob = new Blob([dados], {type: "text/csv"});
-				  var url = window.URL.createObjectURL(myBlob);
-				  var anchor = document.createElement("a");
-				  anchor.href = url;
-				  anchor.download = "export.csv";
-				  anchor.click();
-			}
-	
+				
 	
         </script>
     </head>
