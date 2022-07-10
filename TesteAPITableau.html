@@ -118,17 +118,25 @@
 								
 								if(cont==0){
 								
+									var cc = 0;
 									for(var k of Object.keys(d)){
 									
-										cabecalho.push({ title: k });
-									
+										cc++;
+										if(cc<8){
+											cabecalho.push({ title: k });
+										}
 									}
 								}
 								cont ++;
 								var linha = [];	
-								for(var x = 0; x < cabecalho.length; x++){
+								for(var x = 0; x < 13; x++){
 								
-									linha.push(d[x].value);						
+									if( x!=1 &&  x!=4 &&  x!=5 &&  x!=7 &&  x!=10 &&  x!=11){
+										
+										linha.push(d[x].value);		
+									
+									}
+													
 								
 								}		
 								tabela.push(linha);
@@ -142,7 +150,17 @@
 							tt.DataTable({
 								data: tabela,
 								paging: false,
-								columns: cabecalho,							
+								columns: cabecalho,		
+								columnDefs: [
+											{
+												target: 1,
+												visible: false,												
+											},
+											{
+												target: 4,
+												visible: false,
+											},
+										]								
 							});
 						
 						  
