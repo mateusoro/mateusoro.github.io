@@ -103,7 +103,8 @@
 							tabela.push(linha);
 						}
 						$('#tabelas').DataTable({
-							data: tabela,
+							data: tabela, 
+							paging: false,
 							columns: [
 								{ title: 'ID' },
 								{ title: 'Ano' },
