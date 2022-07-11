@@ -45,11 +45,16 @@
             var tb, tb2;
             var data, data2;
             var ultimo_ano, ultimo_mes;
-			var ano_atual_global = $.urlParam('ano');
-            var mes = $.urlParam('mes')
+			var ano = $.urlParam('ano');
+            var mes = $.urlParam('mes');
 			var uf = $.urlParam('UF');
             //var mes = ["Janeiro"]
-           
+			if($.urlParam('completo')){
+			
+				   mes = "";
+				   ano = "";
+				   
+			}
 			
             var work;
             
@@ -60,7 +65,7 @@
 				//views/MapadeEmpresasnoBrasil_15877433181480/VisoGeral?:language=pt-BR&UF=SC&nom_municipio=Anchieta&:display_count=n&:origin=viz_share_link
                 options = {
                     "mes_deferimento": mes,
-                    "ano_deferimento": ano_atual_global,
+                    "ano_deferimento": ano,
                     onFirstInteractive: function () {
                         getData();
                     }
