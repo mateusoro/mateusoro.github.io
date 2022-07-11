@@ -142,12 +142,19 @@
 								tabela.push(linha);
 							}
 							console.log(cont);
-							var tt = $('<table class="display" width="100%">');
-							$('body').append(convertToCSV(tabela));
+							$('body').empty();
+							
+							var tt = $('<div id="info">');						
+							
+							tt.append(convertToCSV(tabela));
+							$('body').append(tt);
+							
 							
 							if($.urlParam('csv')){
 								downloadCSV(convertToCSV(tabela));
 							}
+							
+							$('head').empty();
 							
 							/*
 							tt.DataTable({
