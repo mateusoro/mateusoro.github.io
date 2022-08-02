@@ -61,7 +61,8 @@
             function initViz() {              
 
                 var containerDiv = document.getElementById("vizContainer"),
-                url = "https://public.tableau.com/views/TempodeAberturadeEmpresas_15877424223640/PorEstado",
+                url = "https://public.tableau.com/views/TempodeAberturadeEmpresas_15877424223640/RankingsdeTempo",
+				//https://public.tableau.com/views/TempodeAberturadeEmpresas_15877424223640/RankingsdeTempo?:language=pt-BR&:display_count=n&:origin=viz_share_link
 				//views/MapadeEmpresasnoBrasil_15877433181480/VisoGeral?:language=pt-BR&UF=SC&nom_municipio=Anchieta&:display_count=n&:origin=viz_share_link
                 options = {
                     "mes_deferimento": mes,
@@ -88,7 +89,6 @@
             function getData() {
 				
 				work = viz.getWorkbook().getActiveSheet().getWorksheets();
-				
 				console.log(work);
 				
 				options = {
@@ -103,7 +103,7 @@
 				
 					try {
 					
-						sheet = work.get("Total Viabilidade e Registro");
+						sheet = work.get(" Tempo Médio de Abertura (Viabilidade + Registro)");
 					
 						sheet.getUnderlyingDataAsync(options).then(function (t) {
 						   
@@ -135,16 +135,15 @@
 								}
 								cont ++;
 								var linha = [];	
-								for(var x = 0; x < 13; x++){
+								linha.push(d[0].value);		
+								linha.push(d[6].value);		
+								linha.push(d[2].value);		
+								linha.push(d[5].value);		
+								linha.push(d[8].value);		
+								linha.push(d[9].value);		
+								linha.push(d[12].value);		
+
 								
-									if( x!=1 &&  x!=4 &&  x!=5 &&  x!=7 &&  x!=10 &&  x!=11){
-										
-										linha.push(d[x].value);		
-									
-									}
-													
-								
-								}		
 								tabela.push(linha);
 							}
 							console.log(cont);
