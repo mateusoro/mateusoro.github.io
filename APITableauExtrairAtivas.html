@@ -139,7 +139,7 @@
 								}
 								cont ++;
 								var linha = [];	
-								for(var x = 0; x < d.lenght; x++){
+								for(var x = 0; x < d.length; x++){
 								
 										
 										linha.push(d[x].value);		
@@ -153,10 +153,7 @@
 							
 							var tt = $('<div id="info">');						
 							
-							convertToCSVAppend(tabela,tt);
-							
-							//tt.append(convertToCSV(tabela));							
-							
+							tt.append(convertToCSV(tabela));
 							$('body').append(tt);
 							
 							
@@ -191,15 +188,6 @@
 					} catch (e) {
 						console.log('erro', e);
 					}
-					function convertToCSVAppend(arr,tt) {
-					  const array = [Object.keys(arr[0])].concat(arr)
-
-					  return array.map(it => {
-						tt.append(Object.values(it).toString());
-						return Object.values(it).toString();
-					  }).join('\n')
-					}
-					
 					function convertToCSV(arr) {
 					  const array = [Object.keys(arr[0])].concat(arr)
 
