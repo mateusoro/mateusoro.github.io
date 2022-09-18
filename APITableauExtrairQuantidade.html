@@ -55,7 +55,18 @@
 				   ano = "(Tudo)";
 				   
 			}
+			if(!$.urlParam('ano')){
 			
+				   mes = "(Tudo)";
+				   ano = "(Tudo)";
+				   
+			}
+			if(!$.urlParam('mes')){
+			
+				   mes = "(Tudo)";				  
+				   
+			}
+						
             var work;
             
             function initViz() {              
@@ -129,14 +140,14 @@
 									for(var k of Object.keys(d)){
 									
 										cc++;
-										if(cc<9){
-											cabecalho.push({ title: k });
-										}
+										
+										cabecalho.push({ title: k });
+										
 									}
 								}
 								cont ++;
 								var linha = [];	
-								for(var x = 0; x < 9; x++){
+								for(var x = 0; x < d.length; x++){
 								
 										
 										linha.push(d[x].value);		
