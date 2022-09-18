@@ -153,7 +153,10 @@
 							
 							var tt = $('<div id="info">');						
 							
-							tt.append(convertToCSV(tabela));
+							convertToCSVAppend(tabela,tt);
+							
+							//tt.append(convertToCSV(tabela));							
+							
 							$('body').append(tt);
 							
 							
@@ -188,6 +191,15 @@
 					} catch (e) {
 						console.log('erro', e);
 					}
+					function convertToCSVAppend(arr,tt) {
+					  const array = [Object.keys(arr[0])].concat(arr)
+
+					  return array.map(it => {
+						tt.append(Object.values(it).toString());
+						return Object.values(it).toString();
+					  }).join('\n')
+					}
+					
 					function convertToCSV(arr) {
 					  const array = [Object.keys(arr[0])].concat(arr)
 
