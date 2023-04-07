@@ -59,10 +59,25 @@
                 let width = doc.internal.pageSize.width;
                 let height = doc.internal.pageSize.height;
 
-                doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);
+                doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);				
                 //doc.save('orcamento'+new Date().getTime()+'.pdf');
-		navigator.share(doc.output('bloburl'))
-		//window.open(doc.output('bloburl'), '_blank')
+				window.open(doc.output('bloburl'))
+				try{
+					var file = new File([doc.output('bloburl')], "orcamento.pdf", {type: 'pdf/pdf'});
+					var filesArray = [file];
+
+					if(navigator.canShare && navigator.canShare({ files: filesArray })) {
+					  navigator.share({
+						text: 'some_text',
+						files: filesArray,
+						title: 'some_title',
+						url: 'some_url'
+					  });
+					}
+				} 
+				catch(){
+				}
+				
             
             });
             image.src = base;
