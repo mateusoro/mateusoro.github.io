@@ -61,7 +61,8 @@
 
                 doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);
                 //doc.save('orcamento'+new Date().getTime()+'.pdf');
-		window.open(doc.output('bloburl'), '_blank')
+		navigator.share(doc.output('bloburl'))
+		//window.open(doc.output('bloburl'), '_blank')
             
             });
             image.src = base;
