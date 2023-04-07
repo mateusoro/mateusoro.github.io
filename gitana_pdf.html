@@ -60,7 +60,7 @@
                 let height = doc.internal.pageSize.height;
 
                 doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);
-                doc.save('orcamento.pdf');
+                doc.save('orcamento'+new Date().getTime()+'.pdf');
             
             });
             image.src = base;
