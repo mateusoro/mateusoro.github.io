@@ -60,7 +60,8 @@
                 let height = doc.internal.pageSize.height;
 
                 doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);
-                doc.save('orcamento'+new Date().getTime()+'.pdf');
+                //doc.save('orcamento'+new Date().getTime()+'.pdf');
+		window.open(doc.output('bloburl'))
             
             });
             image.src = base;
