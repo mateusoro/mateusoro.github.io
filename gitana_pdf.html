@@ -61,7 +61,8 @@
 
                 doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);				
                 //doc.save('orcamento'+new Date().getTime()+'.pdf');
-				window.open(doc.output('bloburl'))
+				window.open(doc.output('bloburl'));
+				
 				try{
 					var file = new File([doc.output('bloburl')], "orcamento.pdf", {type: 'pdf/pdf'});
 					var filesArray = [file];
@@ -75,7 +76,7 @@
 					  });
 					}
 				} 
-				catch(){
+				catch(e){
 				}
 				
             
