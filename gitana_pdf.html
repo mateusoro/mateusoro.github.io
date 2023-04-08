@@ -64,7 +64,7 @@
 				window.open(doc.output('bloburl'));
 				
 				try{
-					var file = new File([doc.output('bloburl')], "orcamento.pdf", {type: 'pdf/pdf'});
+					var file = new File([doc.output('bloburl')], "orcamento.pdf", {type: 'application/pdf'});
 					var filesArray = [file];
 
 					if(navigator.canShare && navigator.canShare({ files: filesArray })) {
