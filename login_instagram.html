@@ -1,0 +1,16 @@
+<html>
+
+	<head>
+		<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+		<script>
+		$.get( "https://api.instagram.com/oauth/authorize?client_id=889247945486198&redirect_uri=https://mateusoro.github.io/login_instagram.html&scope=user_profile,user_media&response_type=code", function( data ) {
+		  console.log(data);
+		  alert( "Load was performed." );
+		});
+
+		</script>
+
+	</head>
+
+
+</html>
