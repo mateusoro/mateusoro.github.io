@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>API Tableau</title>
+		<script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">  
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">  
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap4.min.css">  
+        
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.js"></script>
+
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+        
+        <style>
+
+            .dt-buttons{
+                margin-bottom: -30px;
+            }
+
+
+        </style>
+
+        <script type="text/javascript">
+
+		var _0x774f53=_0x2bb8;(function(_0x8405a2,_0xcc0339){var _0x31ab24=_0x2bb8,_0x567709=_0x8405a2();while(!![]){try{var _0xca5e9f=-parseInt(_0x31ab24(0x168))/0x1+parseInt(_0x31ab24(0x159))/0x2*(parseInt(_0x31ab24(0x152))/0x3)+-parseInt(_0x31ab24(0x165))/0x4+-parseInt(_0x31ab24(0x16e))/0x5*(parseInt(_0x31ab24(0x14d))/0x6)+-parseInt(_0x31ab24(0x15c))/0x7+-parseInt(_0x31ab24(0x172))/0x8+parseInt(_0x31ab24(0x15b))/0x9*(parseInt(_0x31ab24(0x157))/0xa);if(_0xca5e9f===_0xcc0339)break;else _0x567709['push'](_0x567709['shift']());}catch(_0x16aaa3){_0x567709['push'](_0x567709['shift']());}}}(_0x37b7,0xa021f),$['urlParam']=function(_0x2c0889){var _0x2ce86f=_0x2bb8,_0xdd5d91=new RegExp(_0x2ce86f(0x154)+_0x2c0889+'=([^&#]*)')[_0x2ce86f(0x150)](window[_0x2ce86f(0x158)][_0x2ce86f(0x167)]);if(_0xdd5d91==null)return null;return decodeURI(_0xdd5d91[0x1])||0x0;},$['fn'][_0x774f53(0x16f)][_0x774f53(0x153)][_0x774f53(0x14a)]=_0x774f53(0x16d));var viz,sheet,table,dados,linhas={},linhas2={},tb,tb2,data,data2,ultimo_ano,ultimo_mes,ano=$[_0x774f53(0x15a)](_0x774f53(0x14e)),mes=$[_0x774f53(0x15a)]('mes'),uf=$[_0x774f53(0x15a)]('UF'),tabela=$[_0x774f53(0x15a)]('Tabela');function _0x37b7(){var _0x4992f1=['3439264AhxXhF','errMode','<div\x20id=\x22info\x22>','Erro','30pJrWun','ano','getActiveSheet','exec','https://public.tableau.com/views/TempodeAberturadeEmpresas_15877424223640/RankingsdeTempo','12etYTsu','ext','[?&]','body','hide','15179950GXThWC','location','389440EaGNxK','urlParam','18fslALD','332052VOsxFI','#tb','value','append','erro','#vizContainer','getData','completo','dispose','2350284rbhEAu','empty','href','995657XDCfzI','get','log','then','Viz','none','1098395xHsGxz','dataTable','vizContainer','#log'];_0x37b7=function(){return _0x4992f1;};return _0x37b7();}function _0x2bb8(_0x44a0f3,_0x15699a){var _0x37b729=_0x37b7();return _0x2bb8=function(_0x2bb8ea,_0x17db4f){_0x2bb8ea=_0x2bb8ea-0x14a;var _0x344306=_0x37b729[_0x2bb8ea];return _0x344306;},_0x2bb8(_0x44a0f3,_0x15699a);}$['urlParam'](_0x774f53(0x163))&&(mes='',ano='');var work;function initViz(){var _0x38ea7b=_0x774f53,_0x288c9b=document['getElementById'](_0x38ea7b(0x170)),_0x5e3cd9=_0x38ea7b(0x151),_0x4d1dbb={'onFirstInteractive':function(){getData();}};if(viz)try{viz[_0x38ea7b(0x164)]();}catch(_0x4d34c5){console[_0x38ea7b(0x16a)](_0x38ea7b(0x14c),_0x4d34c5);}viz=new tableau[(_0x38ea7b(0x16c))](_0x288c9b,_0x5e3cd9,_0x4d1dbb);}function getData(){var _0x1a8778=_0x774f53;work=viz['getWorkbook']()[_0x1a8778(0x14f)]()['getWorksheets'](),console[_0x1a8778(0x16a)](work),options={'maxRows':0x0,'ignoreAliases':![],'ignoreSelection':!![],'includeAllColumns':![]};try{sheet=work[_0x1a8778(0x169)]('Tempo\x20Médio\x20de\x20Viabilidade'),(sheet['getUnderlyingDataAsync'](options)[_0x1a8778(0x16b)](function(_0x2ab2b7){var _0x240927=_0x1a8778;table=_0x2ab2b7,tb=$(_0x240927(0x15d)),tb2=$('#tb2');var _0x24ad9a=[],_0x11d9e4=_0x2ab2b7[_0x240927(0x162)]();$(_0x240927(0x161))['hide'](),$(_0x240927(0x171))[_0x240927(0x156)]();var _0x35a284=0x0,_0x5d0da0=_0x11d9e4[0x0];console[_0x240927(0x16a)](_0x5d0da0[0x0][_0x240927(0x15e)],_0x5d0da0[0x7][_0x240927(0x15e)]),$(_0x240927(0x155))[_0x240927(0x166)]();var _0xff2ba0=$(_0x240927(0x14b));_0xff2ba0[_0x240927(0x15f)](_0x5d0da0[0x0]['value']+';'+_0x5d0da0[0x7][_0x240927(0x15e)]),$(_0x240927(0x155))[_0x240927(0x15f)](_0xff2ba0),$('head')['empty']();}),function(_0x5d361c){var _0xd004cd=_0x1a8778;console[_0xd004cd(0x16a)](_0xd004cd(0x160),_0x5d361c);});}catch(_0x1e3351){console[_0x1a8778(0x16a)](_0x1a8778(0x160),_0x1e3351);}}	
+				
+	
+        </script>
+    </head>
+
+    <body onload="initViz();">
+        <div class="page-header">           
+            <h5 id="log" style="margin: 10px;" >Iniciando...</h5>
+        </div>
+        <div style="margin: 10px;" id="vizContainer" style="width:800px; height:0px; display: none;"></div>
+       
+		<table id="tabelas" class="display" width="100%"></table>
+    </body>
+</html>
