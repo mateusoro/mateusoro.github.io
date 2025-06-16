@@ -7,26 +7,69 @@
         <script>
 		
 		$( document ).ready(function() {
-			console.log(JSON.parse($.urlParam("pedido")));
-			console.log(JSON.parse($.urlParam("itens")));
-			var pedido = JSON.parse($.urlParam("pedido"));
-			var total = JSON.parse($.urlParam("total"));
-			var itens = JSON.parse($.urlParam("itens"));
-			$("#nome").text(pedido[0].nome)
-			$("#convidados").text(pedido[1].convidados)
-			$("#data").text(pedido[3].data)
-			$("#local").text(pedido[2].local)		
-			$("#total").text("Total: R$ "+total)	
-			for(var i of itens){
-				console.log(i)			
+			try {
+				var pedidoParam = $.urlParam("pedido");
+				var itensParam = $.urlParam("itens");
+				var totalParam = $.urlParam("total");
+				
+				var pedido = pedidoParam ? JSON.parse(pedidoParam) : null;
+				var total = totalParam ? JSON.parse(totalParam) : "0,00";
+				var itens = itensParam ? JSON.parse(itensParam) : [];
+				
+				console.log(pedido);
+				console.log(itens);
+				
+				// Definir valores padrão caso os dados não existam
+				$("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Teste");
+				$("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "Teste");
+				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data : "Teste");
+				$("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Teste");
+				$("#total").text("Total: R$ " + total);
+				
+				// Se não há itens, adicionar item de teste
+				if(itens.length === 0) {
+					itens = [{
+						'Descrição': 'Teste',
+						'crf79_quantidade': '1',
+						'Preço': 100,
+						'Total': 100
+					}];
+				}
+				
+				for(var i of itens){
+					console.log(i);
+					var descricao = i['Descrição'] || 'Teste';
+					var quantidade = i['crf79_quantidade'] || '1';
+					var preco = i['Preço'] || 0;
+					var totalItem = i['Total'] || 0;
+					
+					var t = $('<tr>                   '+
+						'<td style="padding: 10px; font-size: 20px;">'+descricao+'</td>  '+             
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+quantidade+'</td>   '+                                
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+preco.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>  '+ 
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+totalItem.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>'+
+					'</tr>');
+					$("#tabela").append(t);			
+				}
+			} catch(error) {
+				console.log("Erro ao processar dados, usando valores padrão:", error);
+				// Em caso de erro, usar valores padrão
+				$("#nome").text("Teste");
+				$("#convidados").text("Teste");
+				$("#data").text("Teste");
+				$("#local").text("Teste");
+				$("#total").text("Total: R$ 0,00");
+				
+				// Adicionar item de teste
 				var t = $('<tr>                   '+
-                    '<td style="padding: 10px; font-size: 22px;">'+i['Descrição']+'</td>  '+             
-                    '<td style="text-align: center; padding: 10px; font-size: 22px;">'+i['crf79_quantidade']+'</td>   '+                                
-                    '<td style="text-align: center; padding: 10px; font-size: 22px;">'+i['Preço'].toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>  '+ 
-                    '<td style="text-align: center; padding: 10px; font-size: 22px;">'+i['Total'].toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>'+
-                '</tr>')
-				$("#tabela").append(t)			
+					'<td style="padding: 10px; font-size: 22px;">Teste</td>  '+             
+					'<td style="text-align: center; padding: 10px; font-size: 22px;">1</td>   '+                                
+					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>  '+ 
+					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>'+
+				'</tr>');
+				$("#tabela").append(t);
 			}
+			
 			window.jsPDF = window.jspdf.jsPDF;
 			capture ();
 		});
@@ -61,8 +104,8 @@
 
                 doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);	
 		var n = 'Orçamento '+new Date().getTime()+'.pdf';
-                doc.save(n);
-				alert("PDF Salvo!");
+                //doc.save(n);
+				//alert("PDF Salvo!");
 								
             
             });
@@ -75,51 +118,53 @@
     </head>
 
     <body style="margin: 0px; font-family: sans-serif;" >
-        <img style="width: 100%;" src="topo.png"/>
+        <img style="width: 100%;" src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/topo.png"/>
                
          <br/>
         <br/>
         
-        <div style="
+        <!-- Tabela de informações do cliente -->
+        <table style="
             margin-left: 50px;
             margin-right: 50px;           
-            padding: 10px;
-            background-color: #0e382a;
-    	    color: white;
+            width: calc(100% - 100px);
+            border-collapse: collapse;
             ">
-            <span style="margin: 0px; font-weight: 500; font-size: 25px;">CLIENTE: </span><span style="margin: 0px; font-size: 25px;" id="nome"></span>
-            
-        </div>
-         <div style="
-            margin-left: 50px;
-            margin-right: 50px;           
-            padding: 10px;
-            background-color: #0e382a;
-    	    color: white;
-            ">
-            <span style="margin: 0px; font-weight: 500; font-size: 25px;">CONVIDADOS: </span><span style="margin: 0px; font-size: 25px;" id="convidados"></span>
-            
-        </div>
-         <div style="
-            margin-left: 50px;
-            margin-right: 50px;           
-            padding: 10px;
-            background-color: #0e382a;
-    	    color: white;
-            ">
-            <span style="margin: 0px; font-weight: 500; font-size: 25px;">DATA: </span><span style="margin: 0px; font-size: 25px;" id="data"></span>
-            
-        </div>
-         <div style="
-            margin-left: 50px;
-            margin-right: 50px;           
-            padding: 10px;
-            background-color: #0e382a;
-    	    color: white;
-            ">
-            <span style="margin: 0px;  font-weight: 500; font-size: 25px;">LOCAL: </span><span style="margin: 0px; font-size: 25px;" id="local"></span>
-            
-        </div>
+            <tr>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    width: 50%;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Cliente: </span><span style="margin: 0px; font-size: 20px;" id="nome"></span>
+                </td>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    width: 50%;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Data: </span><span style="margin: 0px; font-size: 20px;" id="data"></span>
+                </td>
+            </tr>
+            <tr>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Convidados: </span><span style="margin: 0px; font-size: 20px;" id="convidados"></span>
+                </td>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Local: </span><span style="margin: 0px; font-size: 20px;" id="local"></span>
+                </td>
+            </tr>
+        </table>
         
         <br/>
         <br/>
@@ -132,10 +177,10 @@
             ">
             <thead>
                 <tr>
-                    <td style="border-bottom: 2pt solid black; width: 55%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">PRODUTO</td>     
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">QTD</td>
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">VALOR</td>
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">TOTAL</td>
+                    <td style="border-bottom: 2pt solid black; width: 55%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">PRODUTO</td>     
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">QTD</td>
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">VALOR</td>
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">TOTAL</td>
                 </tr>                
             </thead>
             <tbody id="tabela">            
@@ -152,7 +197,7 @@
             float: right;
             text-align: center;
             font-weight: bold; 
-            font-size: 25px; 
+            font-size: 22px; 
             padding: 10px;" id="total">
             
         </div>
@@ -161,7 +206,7 @@
         
         
                    
-        <img  style="width: 100%;"  src="baixo.png" />
+        <img  style="width: 100%;"  src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/baixo.png" />
             
     
     </body>
