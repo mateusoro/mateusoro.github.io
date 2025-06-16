@@ -6,6 +6,35 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script>
 		
+		function waitForImagesToLoad() {
+			return new Promise((resolve) => {
+				const images = document.querySelectorAll('img');
+				let loadedImages = 0;
+				const totalImages = images.length;
+				
+				if (totalImages === 0) {
+					resolve();
+					return;
+				}
+				
+				function imageLoaded() {
+					loadedImages++;
+					if (loadedImages === totalImages) {
+						resolve();
+					}
+				}
+				
+				images.forEach((img) => {
+					if (img.complete) {
+						imageLoaded();
+					} else {
+						img.addEventListener('load', imageLoaded);
+						img.addEventListener('error', imageLoaded);
+					}
+				});
+			});
+		}
+		
 		$( document ).ready(function() {
 			try {
 				var pedidoParam = $.urlParam("pedido");
@@ -71,7 +100,10 @@
 			}
 			
 			window.jsPDF = window.jspdf.jsPDF;
-			capture ();
+			
+			waitForImagesToLoad().then(() => {
+				capture();
+			});
 		});
 		
 		$.urlParam = function(name){
@@ -85,7 +117,10 @@
 		
 		
         function capture () {
-          html2canvas(document.body).then( function (canvas) {
+          html2canvas(document.body, {
+            allowTaint: true,
+            useCORS: true
+          }).then( function (canvas) {
             var base = canvas.toDataURL("image/png");
             let a = document.createElement("a");
             a.download = "orcamento.png";
@@ -94,15 +129,31 @@
             var image = document.createElement('img');
             image.addEventListener('load', function() {
                 
-                var largura_mm = image.width;
-                var altura_mm = image.height;
+                var canvasWidth = image.width;
+                var canvasHeight = image.height;
+                var canvasRatio = canvasWidth / canvasHeight;
                
-                var doc = new jsPDF('p', 'px', [largura_mm, altura_mm]);
-                console.log(doc.internal.pageSize);
-                let width = doc.internal.pageSize.width;
-                let height = doc.internal.pageSize.height;
+                var doc = new jsPDF('p', 'mm', 'a4');
+                var pageWidth = doc.internal.pageSize.getWidth();
+                var pageHeight = doc.internal.pageSize.getHeight();
+                var pageRatio = pageWidth / pageHeight;
+                
+                var imgWidth, imgHeight;
+                
+                if (canvasRatio > pageRatio) {
+                    // Canvas é mais largo que a página
+                    imgWidth = pageWidth;
+                    imgHeight = pageWidth / canvasRatio;
+                } else {
+                    // Canvas é mais alto que a página
+                    imgHeight = pageHeight;
+                    imgWidth = pageHeight * canvasRatio;
+                }
+                
+                var x = (pageWidth - imgWidth) / 2;
+                var y = 0;
 
-                doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);	
+                doc.addImage(canvas.toDataURL("image/png"), 'PNG', x, y, imgWidth, imgHeight);	
 		var n = 'Orçamento '+new Date().getTime()+'.pdf';
                 doc.save(n);
 				alert("PDF Salvo!");
