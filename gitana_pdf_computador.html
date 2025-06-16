@@ -38,7 +38,7 @@
 				
 				for(var i of itens){
 					console.log(i);
-					var descricao = i['Descrição'] || 'Teste';
+					var descricao = (i['Descrição'] || 'Teste').replace(/\n/g, '<br>');
 					var quantidade = i['crf79_quantidade'] || '1';
 					var preco = i['Preço'] || 0;
 					var totalItem = i['Total'] || 0;

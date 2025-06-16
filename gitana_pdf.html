@@ -86,7 +86,7 @@
             .product-details {
                 padding: 8px;
                 font-size: 10px;
-                background-color: #f9f9f9;
+                background-color: #ffffff;
                 border-bottom: 1px solid #ddd;
                 word-wrap: break-word;
             }
@@ -164,14 +164,14 @@
                 // Processar itens
                 for(var i of itens){
                     console.log("Processando item:", i);
-                    var descricao = i['Descrição'] || 'Item sem descrição';
+                    var descricao = (i['Descrição'] || 'Item sem descrição').replace(/\n/g, '<br>');
                     var quantidade = i['crf79_quantidade'] || '1';
                     var preco = i['Preço'] || 0;
                     var totalItem = i['Total'] || 0;
                     
                     // Linha da descrição
                     var descricaoRow = $('<tr>' +
-                        '<td class="product-description" colspan="3">' + escapeHtml(descricao) + '</td>' +
+                        '<td class="product-description" colspan="3">' + descricao + '</td>' +
                     '</tr>');
                     
                     // Linha dos detalhes (QTD, VALOR, TOTAL)
