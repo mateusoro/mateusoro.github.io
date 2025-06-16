@@ -135,7 +135,7 @@
                   dataEvento = dataEvento.split(':')[0]; // Remove hora se houver
                   dataEvento = dataEvento.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui / - por _
                   
-                  var n = 'Orçamento_' + cliente + '_' + dataEvento + '.pdf';
+                  var n = 'Orçamento_' + cliente + '_' + dataEvento + '_computador.pdf';
                   doc.save(n);
 				  alert("PDF Salvo!");
 								  

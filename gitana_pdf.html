@@ -265,6 +265,20 @@
             });
         }
         
+        // Função para redirecionar com os mesmos parâmetros da URL
+        function redirectToDesktop() {
+            // Capturar os parâmetros da URL atual
+            var currentParams = window.location.search;
+            
+            // Construir a nova URL com os mesmos parâmetros
+            var desktopUrl = "https://mateusoro.github.io/gitana_pdf_computador.html" + currentParams;
+            
+            console.log("Redirecionando para:", desktopUrl);
+            
+            // Redirecionar para a página de desktop
+            window.location.href = desktopUrl;
+        }
+        
         function capture() {
             // Aguardar o carregamento completo das imagens antes de capturar
             var images = document.querySelectorAll('img');
@@ -345,6 +359,11 @@
                         try {
                             doc.save(nomeArquivo);
                             alert("PDF salvo com sucesso!");
+                            
+                            // Redirecionar para a página de desktop após salvar
+                            setTimeout(function() {
+                                redirectToDesktop();
+                            }, 500); // Aguardar meio segundo para garantir que o download foi iniciado
                             
                         } catch (error) {
                             console.error("Erro ao salvar PDF:", error);
