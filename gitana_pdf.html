@@ -22,7 +22,7 @@
 				// Definir valores padrão caso os dados não existam
 				$("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Teste");
 				$("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "Teste");
-				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data : "Teste");
+				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data+"h" : "Teste"+"h");
 				$("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Teste");
 				$("#total").text("Total: R$ " + total);
 				
@@ -45,9 +45,9 @@
 					
 					var t = $('<tr>                   '+
 						'<td style="padding: 10px; font-size: 22px;">'+descricao+'</td>  '+             
-						'<td style="text-align: center; padding: 10px; font-size: 22px;">'+quantidade+'</td>   '+                                
-						'<td style="text-align: center; padding: 10px; font-size: 22px;">'+preco.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>  '+ 
-						'<td style="text-align: center; padding: 10px; font-size: 22px;">'+totalItem.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>'+
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+quantidade+'</td>   '+                                
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+preco.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>  '+ 
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+totalItem.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>'+
 					'</tr>');
 					$("#tabela").append(t);			
 				}
@@ -85,46 +85,65 @@
 		
 		
         function capture () {
-          html2canvas(document.body).then( function (canvas) {
-            var base = canvas.toDataURL("image/png");
-            let a = document.createElement("a");
-            a.download = "orcamento.png";
-            a.href = base;
-            //a.click(); // MAY NOT ALWAYS WORK!
-            var image = document.createElement('img');
-            image.addEventListener('load', function() {
-                
-                var largura_mm = image.width;
-                var altura_mm = image.height;
-               
-                var doc = new jsPDF('p', 'px', [largura_mm, altura_mm]);
-                console.log(doc.internal.pageSize);
-                let width = doc.internal.pageSize.width;
-                let height = doc.internal.pageSize.height;
-
-                doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);	
-                
-                // Capturar nome do cliente e data do evento para o nome do arquivo
-                var cliente = $("#nome").text() || "Teste";
-                var dataEvento = $("#data").text() || "Teste";
-                
-                // Limpar caracteres especiais do nome do arquivo
-                cliente = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
-                
-                // Processar a data para extrair apenas a data (sem hora/minuto)
-                // Remove tudo após espaço ou dois pontos para eliminar hora
-                dataEvento = dataEvento.split(' ')[0]; // Pega só a primeira parte antes do espaço
-                dataEvento = dataEvento.split(':')[0]; // Remove hora se houver
-                dataEvento = dataEvento.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui / - por _
-                
-                var n = 'Orçamento_' + cliente + '_' + dataEvento + '.pdf';
-                doc.save(n);
-				alert("PDF Salvo!");
-								
-            
+          // Aguardar o carregamento completo das imagens antes de capturar
+          var images = document.querySelectorAll('img');
+          var imagePromises = Array.from(images).map(function(img) {
+            return new Promise(function(resolve) {
+              if (img.complete) {
+                resolve();
+              } else {
+                img.onload = function() { resolve(); };
+                img.onerror = function() { resolve(); }; // Resolve mesmo com erro para não travar
+              }
             });
-            image.src = base;
-            
+          });
+          
+          Promise.all(imagePromises).then(function() {
+            html2canvas(document.body, {
+              useCORS: true,
+              allowTaint: true,
+              scale: 1
+            }).then( function (canvas) {
+              var base = canvas.toDataURL("image/png");
+              let a = document.createElement("a");
+              a.download = "orcamento.png";
+              a.href = base;
+              //a.click(); // MAY NOT ALWAYS WORK!
+              var image = document.createElement('img');
+              image.addEventListener('load', function() {
+                  
+                  var largura_mm = image.width;
+                  var altura_mm = image.height;
+                 
+                  var doc = new jsPDF('p', 'px', [largura_mm, altura_mm]);
+                  console.log(doc.internal.pageSize);
+                  let width = doc.internal.pageSize.width;
+                  let height = doc.internal.pageSize.height;
+
+                  doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);	
+                  
+                  // Capturar nome do cliente e data do evento para o nome do arquivo
+                  var cliente = $("#nome").text() || "Teste";
+                  var dataEvento = $("#data").text() || "Teste";
+                  
+                  // Limpar caracteres especiais do nome do arquivo
+                  cliente = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+                  
+                  // Processar a data para extrair apenas a data (sem hora/minuto)
+                  // Remove tudo após espaço ou dois pontos para eliminar hora
+                  dataEvento = dataEvento.split(' ')[0]; // Pega só a primeira parte antes do espaço
+                  dataEvento = dataEvento.split(':')[0]; // Remove hora se houver
+                  dataEvento = dataEvento.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui / - por _
+                  
+                  var n = 'Orçamento_' + cliente + '_' + dataEvento + '.pdf';
+                  doc.save(n);
+				  alert("PDF Salvo!");
+								  
+              
+              });
+              image.src = base;
+              
+            });
           });
         }
        
@@ -151,7 +170,7 @@
                     color: white;
                     width: 50%;
                     ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Cliente: </span><span style="margin: 0px; font-size: 25px;" id="nome"></span>
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Cliente: </span><span style="margin: 0px; font-size: 20px;" id="nome"></span>
                 </td>
                 <td style="
                     padding: 10px;
@@ -159,7 +178,7 @@
                     color: white;
                     width: 50%;
                     ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Data: </span><span style="margin: 0px; font-size: 25px;" id="data"></span>
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Data: </span><span style="margin: 0px; font-size: 20px;" id="data"></span>
                 </td>
             </tr>
             <tr>
@@ -168,14 +187,14 @@
                     background-color: #0e382a;
                     color: white;
                     ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Convidados: </span><span style="margin: 0px; font-size: 25px;" id="convidados"></span>
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Convidados: </span><span style="margin: 0px; font-size: 20px;" id="convidados"></span>
                 </td>
                 <td style="
                     padding: 10px;
                     background-color: #0e382a;
                     color: white;
                     ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Local: </span><span style="margin: 0px; font-size: 25px;" id="local"></span>
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Local: </span><span style="margin: 0px; font-size: 20px;" id="local"></span>
                 </td>
             </tr>
         </table>
@@ -191,10 +210,10 @@
             ">
             <thead>
                 <tr>
-                    <td style="border-bottom: 2pt solid black; width: 55%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">PRODUTO</td>     
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">QTD</td>
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">VALOR</td>
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 30px; padding: 10px; ">TOTAL</td>
+                    <td style="border-bottom: 2pt solid black; width: 55%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">PRODUTO</td>     
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">QTD</td>
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">VALOR</td>
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">TOTAL</td>
                 </tr>                
             </thead>
             <tbody id="tabela">            
