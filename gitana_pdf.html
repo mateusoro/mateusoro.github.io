@@ -1,247 +1,421 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" ></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" ></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.4/html2canvas.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-        <script>
-		
-		$( document ).ready(function() {
-			try {
-				var pedidoParam = $.urlParam("pedido");
-				var itensParam = $.urlParam("itens");
-				var totalParam = $.urlParam("total");
-				
-				var pedido = pedidoParam ? JSON.parse(pedidoParam) : null;
-				var total = totalParam ? JSON.parse(totalParam) : "0,00";
-				var itens = itensParam ? JSON.parse(itensParam) : [];
-				
-				console.log(pedido);
-				console.log(itens);
-				
-				// Definir valores padrão caso os dados não existam
-				$("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Teste");
-				$("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "Teste");
-				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data+"h" : "Teste"+"h");
-				$("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Teste");
-				$("#total").text("Total: R$ " + total);
-				
-				// Se não há itens, adicionar item de teste
-				if(itens.length === 0) {
-					itens = [{
-						'Descrição': 'Teste',
-						'crf79_quantidade': '1',
-						'Preço': 100,
-						'Total': 100
-					}];
-				}
-				
-				for(var i of itens){
-					console.log(i);
-					var descricao = i['Descrição'] || 'Teste';
-					var quantidade = i['crf79_quantidade'] || '1';
-					var preco = i['Preço'] || 0;
-					var totalItem = i['Total'] || 0;
-					
-					var t = $('<tr>                   '+
-						'<td style="padding: 10px; font-size: 22px;">'+descricao+'</td>  '+             
-						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+quantidade+'</td>   '+                                
-						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+preco.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>  '+ 
-						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+totalItem.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>'+
-					'</tr>');
-					$("#tabela").append(t);			
-				}
-			} catch(error) {
-				console.log("Erro ao processar dados, usando valores padrão:", error);
-				// Em caso de erro, usar valores padrão
-				$("#nome").text("Teste");
-				$("#convidados").text("Teste");
-				$("#data").text("Teste");
-				$("#local").text("Teste");
-				$("#total").text("Total: R$ 0,00");
-				
-				// Adicionar item de teste
-				var t = $('<tr>                   '+
-					'<td style="padding: 10px; font-size: 22px;">Teste</td>  '+             
-					'<td style="text-align: center; padding: 10px; font-size: 22px;">1</td>   '+                                
-					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>  '+ 
-					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>'+
-				'</tr>');
-				$("#tabela").append(t);
-			}
-			
-			window.jsPDF = window.jspdf.jsPDF;
-			capture ();
-		});
-		
-		$.urlParam = function(name){
-			var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-			if (results==null) {
-			   return null;
-			}
-			return decodeURI(results[1]) || 0;
-		}
-		
-		
-		
-        function capture () {
-          // Aguardar o carregamento completo das imagens antes de capturar
-          var images = document.querySelectorAll('img');
-          var imagePromises = Array.from(images).map(function(img) {
-            return new Promise(function(resolve) {
-              if (img.complete) {
-                resolve();
-              } else {
-                img.onload = function() { resolve(); };
-                img.onerror = function() { resolve(); }; // Resolve mesmo com erro para não travar
-              }
-            });
-          });
-          
-          Promise.all(imagePromises).then(function() {
-            html2canvas(document.body, {
-              useCORS: true,
-              allowTaint: true,
-              scale: 1
-            }).then( function (canvas) {
-              var base = canvas.toDataURL("image/png");
-              let a = document.createElement("a");
-              a.download = "orcamento.png";
-              a.href = base;
-              //a.click(); // MAY NOT ALWAYS WORK!
-              var image = document.createElement('img');
-              image.addEventListener('load', function() {
-                  
-                  var largura_mm = image.width;
-                  var altura_mm = image.height;
-                 
-                  var doc = new jsPDF('p', 'px', [largura_mm, altura_mm]);
-                  console.log(doc.internal.pageSize);
-                  let width = doc.internal.pageSize.width;
-                  let height = doc.internal.pageSize.height;
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <style>
+            /* Container principal com largura fixa e altura dinâmica */
+            .iphone-container {
+                width: 375px; /* Largura padrão do iPhone 15 em CSS pixels */
+                min-height: 812px; /* Altura mínima, mas permite expansão */
+                margin: 0 auto;
+                background: white;
+                overflow: visible; /* Permite que o conteúdo seja visível */
+                position: relative;
+                padding-bottom: 20px; /* Espaço extra no final */
+            }
+            
+            /* Ajustes para telas menores */
+            @media (max-width: 400px) {
+                .iphone-container {
+                    width: 100vw;
+                    min-height: calc(100vw * 2.167); /* Proporção mínima 1179:2556 */
+                }
+            }
+            
+            body {
+                margin: 0px; 
+                font-family: sans-serif;
+                background: #f0f0f0;
+                padding: 20px 0;
+            }
+            
+            .content {
+                padding: 0 20px;
+            }
+            
+            .header-img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+            
+            .client-table {
+                width: calc(100% - 40px);
+                margin: 2px 20px;
+                border-collapse: collapse;
+            }
+            
+            .client-table td {
+                padding: 8px;
+                background-color: #0e382a;
+                color: white;
+                width: 50%;
+                font-size: 10px;
+            }
+            
+            .products-table {
+                width: calc(100% - 40px);
+                margin: 2px 20px;
+                padding: 5px;
+                table-layout: fixed;
+            }
+            
+            .products-table thead td {
+                border-bottom: 2pt solid black;
+                text-align: center;
+                font-weight: bold;
+                font-size: 12px;
+                padding: 8px;
+            }
+            
+            .products-table tbody td {
+                padding: 8px;                
+            }
+            
+            .product-description {
+                font-weight: normal;
+                font-size: 12px;
+                padding: 12px 8px 8px 8px;
+                word-wrap: break-word; /* Quebra palavras longas */
+                overflow-wrap: break-word;
+            }
+            
+            .product-details {
+                padding: 8px;
+                font-size: 10px;
+                background-color: #f9f9f9;
+                border-bottom: 1px solid #ddd;
+                word-wrap: break-word;
+            }
+            
+            .total-container {
+                border-top: 2pt solid black;
+                margin: 2px 20px;
+                margin-top: 10px; /* Espaço extra antes do total */
+            }
+            
+            .total-value {
+                float: right;
+                text-align: center;
+                font-weight: bold;
+                font-size: 12px;
+                padding: 10px;
+            }
+            
+            .footer-img {
+                width: 100%;
+                height: auto;
+                display: block;
+                margin-top: 20px;
+                clear: both; /* Garante que a imagem fique abaixo do total */
+            }
 
-                  doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);	
-                  
-                  // Capturar nome do cliente e data do evento para o nome do arquivo
-                  var cliente = $("#nome").text() || "Teste";
-                  var dataEvento = $("#data").text() || "Teste";
-                  
-                  // Limpar caracteres especiais do nome do arquivo
-                  cliente = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
-                  
-                  // Processar a data para extrair apenas a data (sem hora/minuto)
-                  // Remove tudo após espaço ou dois pontos para eliminar hora
-                  dataEvento = dataEvento.split(' ')[0]; // Pega só a primeira parte antes do espaço
-                  dataEvento = dataEvento.split(':')[0]; // Remove hora se houver
-                  dataEvento = dataEvento.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui / - por _
-                  
-                  var n = 'Orçamento_' + cliente + '_' + dataEvento + '.pdf';
-                  doc.save(n);
-				  alert("PDF Salvo!");
-								  
-              
-              });
-              image.src = base;
-              
+            .error-message {
+                background-color: #fff3cd;
+                border: 1px solid #ffeaa7;
+                color: #856404;
+                padding: 10px;
+                margin: 10px 20px;
+                border-radius: 4px;
+                font-size: 12px;
+            }
+
+            /* Estilos adicionais para melhor formatação */
+            .products-section {
+                margin-bottom: 20px;
+            }
+        </style>
+        <script>
+        
+        $(document).ready(function() {
+            try {
+                var pedidoParam = getUrlParam("pedido");
+                var itensParam = getUrlParam("itens");
+                var totalParam = getUrlParam("total");
+                
+                var pedido = pedidoParam ? JSON.parse(pedidoParam) : null;
+                var total = totalParam ? totalParam.replace(/"/g, '') : "0,00"; // Remove aspas se existirem
+                var itens = itensParam ? JSON.parse(itensParam) : [];
+                
+                console.log("Pedido:", pedido);
+                console.log("Itens:", itens);
+                console.log("Total:", total);
+                
+                // Definir valores padrão caso os dados não existam
+                $("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Cliente Teste");
+                $("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "50");
+                $("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data+"h" : "01/01/2025 - 18:00");
+                $("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Local do Evento");
+                $("#total").text("Total: R$ " + total);
+                
+                // Se não há itens, adicionar item de teste
+                if(itens.length === 0) {
+                    itens = [{
+                        'Descrição': 'Item de Teste',
+                        'crf79_quantidade': '1',
+                        'Preço': 100,
+                        'Total': 100
+                    }];
+                }
+                
+                // Processar itens
+                for(var i of itens){
+                    console.log("Processando item:", i);
+                    var descricao = i['Descrição'] || 'Item sem descrição';
+                    var quantidade = i['crf79_quantidade'] || '1';
+                    var preco = i['Preço'] || 0;
+                    var totalItem = i['Total'] || 0;
+                    
+                    // Linha da descrição
+                    var descricaoRow = $('<tr>' +
+                        '<td class="product-description" colspan="3">' + escapeHtml(descricao) + '</td>' +
+                    '</tr>');
+                    
+                    // Linha dos detalhes (QTD, VALOR, TOTAL)
+                    var detalhesRow = $('<tr>' +
+                        '<td class="product-details" style="text-align: center;"><strong>Qtd:</strong> ' + quantidade + '</td>' +
+                        '<td class="product-details" style="text-align: center;"><strong>Valor:</strong> R$ ' + formatCurrency(preco) + '</td>' +
+                        '<td class="product-details" style="text-align: center;"><strong>Total:</strong> R$ ' + formatCurrency(totalItem) + '</td>' +
+                    '</tr>');
+                    
+                    $("#tabela").append(descricaoRow);
+                    $("#tabela").append(detalhesRow);
+                }
+                
+                // Esconder mensagem de erro se chegou até aqui
+                $(".error-message").hide();
+                
+            } catch(error) {
+                console.error("Erro ao processar dados:", error);
+                
+                // Mostrar mensagem de erro na interface
+                $(".error-message").show().text("Erro ao carregar dados: " + error.message);
+                
+                // Em caso de erro, usar valores padrão
+                $("#nome").text("Cliente Teste");
+                $("#convidados").text("50");
+                $("#data").text("01/01/2025 - 18:00");
+                $("#local").text("Local do Evento");
+                $("#total").text("Total: R$ 0,00");
+                
+                // Adicionar item de teste
+                var descricaoRow = $('<tr>' +
+                    '<td class="product-description" colspan="3">Item de Teste</td>' +
+                '</tr>');
+                
+                var detalhesRow = $('<tr>' +
+                    '<td class="product-details" style="text-align: center;"><strong>QTD:</strong> 1</td>' +
+                    '<td class="product-details" style="text-align: center;"><strong>VALOR:</strong> R$ 100,00</td>' +
+                    '<td class="product-details" style="text-align: center;"><strong>TOTAL:</strong> R$ 100,00</td>' +
+                '</tr>');
+                
+                $("#tabela").append(descricaoRow);
+                $("#tabela").append(detalhesRow);
+            }
+            
+            window.jsPDF = window.jspdf.jsPDF;
+            // Aguardar um pouco antes de capturar para garantir que tudo foi renderizado
+            setTimeout(capture, 1000);
+        });
+        
+        // Função melhorada para obter parâmetros da URL
+        function getUrlParam(name) {
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                var param = urlParams.get(name);
+                
+                if (param === null) {
+                    return null;
+                }
+                
+                // Tentar decodificar de forma segura
+                try {
+                    return decodeURIComponent(param);
+                } catch (e) {
+                    console.warn("Erro ao decodificar parâmetro " + name + ":", e);
+                    // Se falhar, tentar sem decodificação
+                    return param;
+                }
+            } catch (error) {
+                console.error("Erro ao obter parâmetro " + name + ":", error);
+                return null;
+            }
+        }
+        
+        // Função para escapar HTML
+        function escapeHtml(text) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+        
+        // Função para formatar moeda
+        function formatCurrency(value) {
+            return parseFloat(value).toLocaleString('pt-BR', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
             });
-          });
+        }
+        
+        function capture() {
+            // Aguardar o carregamento completo das imagens antes de capturar
+            var images = document.querySelectorAll('img');
+            var imagePromises = Array.from(images).map(function(img) {
+                return new Promise(function(resolve) {
+                    if (img.complete) {
+                        resolve();
+                    } else {
+                        img.onload = function() { resolve(); };
+                        img.onerror = function() { resolve(); }; // Resolve mesmo com erro para não travar
+                    }
+                });
+            });
+            
+            Promise.all(imagePromises).then(function() {
+                // Capturar apenas o container do iPhone
+                var container = document.querySelector('.iphone-container');
+                
+                // Calcular a altura real do conteúdo
+                var containerHeight = container.scrollHeight;
+                var containerWidth = 375;
+                
+                console.log("Altura real do container:", containerHeight);
+                
+                html2canvas(container, {
+                    useCORS: true,
+                    allowTaint: true,
+                    scale: 2, // Aumentar a qualidade
+                    width: containerWidth,
+                    height: containerHeight, // Usar altura real do conteúdo
+                    scrollX: 0,
+                    scrollY: 0
+                }).then(function(canvas) {
+                    var base = canvas.toDataURL("image/png");
+                    
+                    var image = document.createElement('img');
+                    image.addEventListener('load', function() {
+                        
+                        // Usar largura fixa e altura dinâmica baseada no conteúdo
+                        var pdf_width = 375;  // largura CSS do iPhone 15
+                        var pdf_height = Math.max(812, containerHeight); // altura mínima ou altura real do conteúdo
+                       
+                        // Criar PDF com altura dinâmica
+                        var doc = new jsPDF('p', 'px', [pdf_width, pdf_height]);
+                        console.log("Tamanho do PDF:", doc.internal.pageSize);
+                        let width = doc.internal.pageSize.width;
+                        let height = doc.internal.pageSize.height;
+
+                        // Calcular proporção para manter a qualidade
+                        var canvasRatio = canvas.height / canvas.width;
+                        var pdfRatio = height / width;
+                        
+                        var imgWidth = width;
+                        var imgHeight = width * canvasRatio;
+                        
+                        // Se a imagem for muito alta, ajustar para caber
+                        if (imgHeight > height) {
+                            imgHeight = height;
+                            imgWidth = height / canvasRatio;
+                        }
+
+                        doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0, imgWidth, imgHeight);    
+                        
+                        // Capturar nome do cliente e data do evento para o nome do arquivo
+                        var cliente = $("#nome").text() || "Cliente";
+                        var dataEvento = $("#data").text() || "01_01_2025";
+                        
+                        // Limpar caracteres especiais do nome do arquivo
+                        cliente = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+                        
+                        // Processar a data para extrair apenas a data (sem hora/minuto)
+                        dataEvento = dataEvento.split(' ')[0]; // Pega só a primeira parte antes do espaço
+                        dataEvento = dataEvento.split(':')[0]; // Remove hora se houver
+                        dataEvento = dataEvento.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui / - por _
+                        
+                        var nomeArquivo = 'Orcamento_' + cliente + '_' + dataEvento + '.pdf';
+                        
+                        try {
+                            doc.save(nomeArquivo);
+                            alert("PDF salvo com sucesso!");
+                            
+                        } catch (error) {
+                            console.error("Erro ao salvar PDF:", error);
+                            alert("Erro ao salvar PDF: " + error.message);
+                        }
+                    });
+                    image.src = base;
+                    
+                }).catch(function(error) {
+                    console.error("Erro ao gerar canvas:", error);
+                    alert("Erro ao gerar PDF: " + error.message);
+                });
+            });
         }
        
         </script>
     </head>
 
-    <body style="margin: 0px; font-family: sans-serif;" >
-        <img style="width: 100%;" src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/topo.png"/>
-               
-         <br/>
-        <br/>
-        
-        <!-- Tabela de informações do cliente -->
-        <table style="
-            margin-left: 50px;
-            margin-right: 50px;           
-            width: calc(100% - 100px);
-            border-collapse: collapse;
-            ">
-            <tr>
-                <td style="
-                    padding: 10px;
-                    background-color: #0e382a;
-                    color: white;
-                    width: 50%;
-                    ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Cliente: </span><span style="margin: 0px; font-size: 20px;" id="nome"></span>
-                </td>
-                <td style="
-                    padding: 10px;
-                    background-color: #0e382a;
-                    color: white;
-                    width: 50%;
-                    ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Data: </span><span style="margin: 0px; font-size: 20px;" id="data"></span>
-                </td>
-            </tr>
-            <tr>
-                <td style="
-                    padding: 10px;
-                    background-color: #0e382a;
-                    color: white;
-                    ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Convidados: </span><span style="margin: 0px; font-size: 20px;" id="convidados"></span>
-                </td>
-                <td style="
-                    padding: 10px;
-                    background-color: #0e382a;
-                    color: white;
-                    ">
-                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Local: </span><span style="margin: 0px; font-size: 20px;" id="local"></span>
-                </td>
-            </tr>
-        </table>
-        
-        <br/>
-        <br/>
-       
-       
-        <table style="
-            margin-left: 50px;
-            margin-right: 50px;           
-            padding: 10px;          
-            ">
-            <thead>
-                <tr>
-                    <td style="border-bottom: 2pt solid black; width: 55%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">PRODUTO</td>     
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">QTD</td>
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">VALOR</td>
-                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">TOTAL</td>
-                </tr>                
-            </thead>
-            <tbody id="tabela">            
-
-                                
-            </tbody>
-        </table>
-        <br> <br> <br>
-       <div style="border-top: 2pt solid black; margin-left: 50px; margin-right: 50px; ">
-        <div style="
-            margin-left: 50px;
-            margin-right: 50px;           
-            padding: 10px;  
-            float: right;
-            text-align: center;
-            font-weight: bold; 
-            font-size: 25px; 
-            padding: 10px;" id="total">
+    <body>
+        <div class="iphone-container">
+            <div class="error-message" style="display: none;">
+                Erro ao carregar dados da URL
+            </div>
             
-        </div>
-            
-       </div>
-        
-        
+            <img class="header-img" src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/topo.png"/>
                    
-        <img  style="width: 100%;"  src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/baixo.png" />
+            <!-- Tabela de informações do cliente -->
+            <table class="client-table">
+                <tr>
+                    <td>
+                        <span style="font-weight: 500;">Cliente: </span><span id="nome"></span>
+                    </td>
+                    <td>
+                        <span style="font-weight: 500;">Data: </span><span id="data"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span style="font-weight: 500;">Convidados: </span><span id="convidados"></span>
+                    </td>
+                    <td>
+                        <span style="font-weight: 500;">Local: </span><span id="local"></span>
+                    </td>
+                </tr>
+            </table>
+           
+            <div class="products-section">
+                <table class="products-table">
+                    <colgroup>
+                        <col style="width: 25.33%;">
+                        <col style="width: 33.33%;">
+                        <col style="width: 33.34%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <td style="width: 100%; font-style: italic;" colspan="3">Menu</td>     
+                        </tr>                
+                    </thead>
+                    <tbody id="tabela">            
+                    </tbody>
+                </table>
+            </div>
             
-    
+           <div class="total-container">
+            <div class="total-value" id="total">
+                
+            </div>
+           </div>
+            
+            <img class="footer-img" src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/baixo.png" />
+        </div>
     </body>
 
 </html>

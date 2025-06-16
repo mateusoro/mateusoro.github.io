@@ -1,0 +1,247 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.4/html2canvas.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+		
+		$( document ).ready(function() {
+			try {
+				var pedidoParam = $.urlParam("pedido");
+				var itensParam = $.urlParam("itens");
+				var totalParam = $.urlParam("total");
+				
+				var pedido = pedidoParam ? JSON.parse(pedidoParam) : null;
+				var total = totalParam ? JSON.parse(totalParam) : "0,00";
+				var itens = itensParam ? JSON.parse(itensParam) : [];
+				
+				console.log(pedido);
+				console.log(itens);
+				
+				// Definir valores padrão caso os dados não existam
+				$("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Teste");
+				$("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "Teste");
+				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data+"h" : "Teste"+"h");
+				$("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Teste");
+				$("#total").text("Total: R$ " + total);
+				
+				// Se não há itens, adicionar item de teste
+				if(itens.length === 0) {
+					itens = [{
+						'Descrição': 'Teste',
+						'crf79_quantidade': '1',
+						'Preço': 100,
+						'Total': 100
+					}];
+				}
+				
+				for(var i of itens){
+					console.log(i);
+					var descricao = i['Descrição'] || 'Teste';
+					var quantidade = i['crf79_quantidade'] || '1';
+					var preco = i['Preço'] || 0;
+					var totalItem = i['Total'] || 0;
+					
+					var t = $('<tr>                   '+
+						'<td style="padding: 10px; font-size: 22px;">'+descricao+'</td>  '+             
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+quantidade+'</td>   '+                                
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+preco.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>  '+ 
+						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+totalItem.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>'+
+					'</tr>');
+					$("#tabela").append(t);			
+				}
+			} catch(error) {
+				console.log("Erro ao processar dados, usando valores padrão:", error);
+				// Em caso de erro, usar valores padrão
+				$("#nome").text("Teste");
+				$("#convidados").text("Teste");
+				$("#data").text("Teste");
+				$("#local").text("Teste");
+				$("#total").text("Total: R$ 0,00");
+				
+				// Adicionar item de teste
+				var t = $('<tr>                   '+
+					'<td style="padding: 10px; font-size: 22px;">Teste</td>  '+             
+					'<td style="text-align: center; padding: 10px; font-size: 22px;">1</td>   '+                                
+					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>  '+ 
+					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>'+
+				'</tr>');
+				$("#tabela").append(t);
+			}
+			
+			window.jsPDF = window.jspdf.jsPDF;
+			capture ();
+		});
+		
+		$.urlParam = function(name){
+			var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+			if (results==null) {
+			   return null;
+			}
+			return decodeURI(results[1]) || 0;
+		}
+		
+		
+		
+        function capture () {
+          // Aguardar o carregamento completo das imagens antes de capturar
+          var images = document.querySelectorAll('img');
+          var imagePromises = Array.from(images).map(function(img) {
+            return new Promise(function(resolve) {
+              if (img.complete) {
+                resolve();
+              } else {
+                img.onload = function() { resolve(); };
+                img.onerror = function() { resolve(); }; // Resolve mesmo com erro para não travar
+              }
+            });
+          });
+          
+          Promise.all(imagePromises).then(function() {
+            html2canvas(document.body, {
+              useCORS: true,
+              allowTaint: true,
+              scale: 1
+            }).then( function (canvas) {
+              var base = canvas.toDataURL("image/png");
+              let a = document.createElement("a");
+              a.download = "orcamento.png";
+              a.href = base;
+              //a.click(); // MAY NOT ALWAYS WORK!
+              var image = document.createElement('img');
+              image.addEventListener('load', function() {
+                  
+                  var largura_mm = image.width;
+                  var altura_mm = image.height;
+                 
+                  var doc = new jsPDF('p', 'px', [largura_mm, altura_mm]);
+                  console.log(doc.internal.pageSize);
+                  let width = doc.internal.pageSize.width;
+                  let height = doc.internal.pageSize.height;
+
+                  doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);	
+                  
+                  // Capturar nome do cliente e data do evento para o nome do arquivo
+                  var cliente = $("#nome").text() || "Teste";
+                  var dataEvento = $("#data").text() || "Teste";
+                  
+                  // Limpar caracteres especiais do nome do arquivo
+                  cliente = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+                  
+                  // Processar a data para extrair apenas a data (sem hora/minuto)
+                  // Remove tudo após espaço ou dois pontos para eliminar hora
+                  dataEvento = dataEvento.split(' ')[0]; // Pega só a primeira parte antes do espaço
+                  dataEvento = dataEvento.split(':')[0]; // Remove hora se houver
+                  dataEvento = dataEvento.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui / - por _
+                  
+                  var n = 'Orçamento_' + cliente + '_' + dataEvento + '.pdf';
+                  doc.save(n);
+				  alert("PDF Salvo!");
+								  
+              
+              });
+              image.src = base;
+              
+            });
+          });
+        }
+       
+        </script>
+    </head>
+
+    <body style="margin: 0px; font-family: sans-serif;" >
+        <img style="width: 100%;" src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/topo.png"/>
+               
+         <br/>
+        <br/>
+        
+        <!-- Tabela de informações do cliente -->
+        <table style="
+            margin-left: 50px;
+            margin-right: 50px;           
+            width: calc(100% - 100px);
+            border-collapse: collapse;
+            ">
+            <tr>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    width: 50%;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Cliente: </span><span style="margin: 0px; font-size: 20px;" id="nome"></span>
+                </td>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    width: 50%;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Data: </span><span style="margin: 0px; font-size: 20px;" id="data"></span>
+                </td>
+            </tr>
+            <tr>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Convidados: </span><span style="margin: 0px; font-size: 20px;" id="convidados"></span>
+                </td>
+                <td style="
+                    padding: 10px;
+                    background-color: #0e382a;
+                    color: white;
+                    ">
+                    <span style="margin: 0px; font-weight: 500; font-size: 20px;">Local: </span><span style="margin: 0px; font-size: 20px;" id="local"></span>
+                </td>
+            </tr>
+        </table>
+        
+        <br/>
+        <br/>
+       
+       
+        <table style="
+            margin-left: 50px;
+            margin-right: 50px;           
+            padding: 10px;          
+            ">
+            <thead>
+                <tr>
+                    <td style="border-bottom: 2pt solid black; width: 55%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">PRODUTO</td>     
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">QTD</td>
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">VALOR</td>
+                    <td style="border-bottom: 2pt solid black; width: 15%; text-align: center; font-weight: bold; font-size: 22px; padding: 10px; ">TOTAL</td>
+                </tr>                
+            </thead>
+            <tbody id="tabela">            
+
+                                
+            </tbody>
+        </table>
+        <br> <br> <br>
+       <div style="border-top: 2pt solid black; margin-left: 50px; margin-right: 50px; ">
+        <div style="
+            margin-left: 50px;
+            margin-right: 50px;           
+            padding: 10px;  
+            float: right;
+            text-align: center;
+            font-weight: bold; 
+            font-size: 25px; 
+            padding: 10px;" id="total">
+            
+        </div>
+            
+       </div>
+        
+        
+                   
+        <img  style="width: 100%;"  src="https://raw.githubusercontent.com/mateusoro/mateusoro.github.io/master/baixo.png" />
+            
+    
+    </body>
+
+</html>
