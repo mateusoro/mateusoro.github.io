@@ -22,7 +22,7 @@
 				// Definir valores padrão caso os dados não existam
 				$("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Teste");
 				$("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "Teste");
-				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data : "Teste");
+				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data : "16/08/2025 - 18:00"+"h");
 				$("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Teste");
 				$("#total").text("Total: R$ " + total);
 				
@@ -104,8 +104,8 @@
 
                 doc.addImage(canvas.toDataURL("image/png"), 'PNG', 0, 0,width,height);	
 		var n = 'Orçamento '+new Date().getTime()+'.pdf';
-                //doc.save(n);
-				//alert("PDF Salvo!");
+                doc.save(n);
+				alert("PDF Salvo!");
 								
             
             });
