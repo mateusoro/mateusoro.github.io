@@ -110,7 +110,12 @@
                 
                 // Limpar caracteres especiais do nome do arquivo
                 cliente = cliente.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
-                dataEvento = dataEvento.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+                
+                // Processar a data para extrair apenas a data (sem hora/minuto)
+                // Remove tudo após espaço ou dois pontos para eliminar hora
+                dataEvento = dataEvento.split(' ')[0]; // Pega só a primeira parte antes do espaço
+                dataEvento = dataEvento.split(':')[0]; // Remove hora se houver
+                dataEvento = dataEvento.replace(/[^a-zA-Z0-9]/g, '_'); // Substitui / - por _
                 
                 var n = 'Orçamento_' + cliente + '_' + dataEvento + '.pdf';
                 doc.save(n);
