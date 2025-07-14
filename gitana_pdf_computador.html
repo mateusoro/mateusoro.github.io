@@ -6,81 +6,98 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script>
 		
-		$( document ).ready(function() {
-			try {
-				var pedidoParam = $.urlParam("pedido");
-				var itensParam = $.urlParam("itens");
-				var totalParam = $.urlParam("total");
-				
-				var pedido = pedidoParam ? JSON.parse(pedidoParam) : null;
-				var total = totalParam ? JSON.parse(totalParam) : "0,00";
-				var itens = itensParam ? JSON.parse(itensParam) : [];
-				
-				console.log(pedido);
-				console.log(itens);
-				
-				// Definir valores padrão caso os dados não existam
-				$("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Teste");
-				$("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "Teste");
-				$("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data+"h" : "Teste"+"h");
-				$("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Teste");
-				$("#total").text("Total: R$ " + total);
-				
-				// Se não há itens, adicionar item de teste
-				if(itens.length === 0) {
-					itens = [{
-						'Descrição': 'Teste',
-						'crf79_quantidade': '1',
-						'Preço': 100,
-						'Total': 100
-					}];
-				}
-				
-				for(var i of itens){
-					console.log(i);
-					var descricao = (i['Descrição'] || 'Teste').replace(/\n/g, '<br>');
-					var quantidade = i['crf79_quantidade'] || '1';
-					var preco = i['Preço'] || 0;
-					var totalItem = i['Total'] || 0;
-					
-					var t = $('<tr>                   '+
-						'<td style="padding: 10px; font-size: 22px;">'+descricao+'</td>  '+             
-						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+quantidade+'</td>   '+                                
-						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+preco.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>  '+ 
-						'<td style="text-align: center; padding: 10px; font-size: 20px;">'+totalItem.toLocaleString('pt-BR',{ minimumFractionDigits: 2 })+'</td>'+
-					'</tr>');
-					$("#tabela").append(t);			
-				}
-			} catch(error) {
-				console.log("Erro ao processar dados, usando valores padrão:", error);
-				// Em caso de erro, usar valores padrão
-				$("#nome").text("Teste");
-				$("#convidados").text("Teste");
-				$("#data").text("Teste");
-				$("#local").text("Teste");
-				$("#total").text("Total: R$ 0,00");
-				
-				// Adicionar item de teste
-				var t = $('<tr>                   '+
-					'<td style="padding: 10px; font-size: 22px;">Teste</td>  '+             
-					'<td style="text-align: center; padding: 10px; font-size: 22px;">1</td>   '+                                
-					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>  '+ 
-					'<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>'+
-				'</tr>');
-				$("#tabela").append(t);
-			}
-			
-			window.jsPDF = window.jspdf.jsPDF;
-			capture ();
-		});
-		
-		$.urlParam = function(name){
-			var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-			if (results==null) {
-			   return null;
-			}
-			return decodeURI(results[1]) || 0;
-		}
+
+               $(document).ready(function() {
+                    try {
+                        var pedidoParam = getUrlParam("pedido");
+                        var itensParam = getUrlParam("itens");
+                        var totalParam = getUrlParam("total");
+                        
+                        var pedido = pedidoParam ? JSON.parse(pedidoParam) : null;
+                        var total = totalParam ? totalParam.replace(/"/g, '') : "0,00"; // Remove aspas se existirem
+                        var itens = itensParam ? JSON.parse(itensParam) : [];
+                        
+                        console.log("Pedido:", pedido);
+                        console.log("Itens:", itens);
+                        console.log("Total:", total);
+                        
+                        // Definir valores padrão caso os dados não existam
+                        $("#nome").text(pedido && pedido.nome ? pedido.nome : "Cliente Teste");
+                        $("#convidados").text(pedido && pedido.convidados ? pedido.convidados : "50");
+                        $("#data").text(pedido && pedido.data ? pedido.data+"h" : "01/01/2025 - 18:00");
+                        $("#local").text(pedido && pedido.local ? pedido.local : "Local do Evento");
+                        $("#total").text("Total: R$ " + total);
+                        
+                        // Se não há itens, adicionar item de teste
+                        if(itens.length === 0) {
+                            itens = [{
+                                'Descrição': 'Item de Teste',
+                                'Quantidade': '1',
+                                'Preço': 100,
+                                'Total': 100
+                            }];
+                        }
+                        
+                        // Processar itens
+                        for(var i of itens) {
+                            var descricao = (i['Descrição'] || 'Item sem descrição').replace(/\n/g, '<br>');
+                            var quantidade = i['Quantidade'] || '1';
+                            var preco = i['Preço'] || 0;
+                            var totalItem = i['Total'] || 0;
+                            
+                            var t = $('<tr>' +
+                                '<td style="padding: 10px; font-size: 22px;">' + descricao + '</td>' +
+                                '<td style="text-align: center; padding: 10px; font-size: 20px;">' + quantidade + '</td>' +
+                                '<td style="text-align: center; padding: 10px; font-size: 20px;">' + preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</td>' +
+                                '<td style="text-align: center; padding: 10px; font-size: 20px;">' + totalItem.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '</td>' +
+                            '</tr>');
+                            $("#tabela").append(t);
+                        }
+                    } catch(error) {
+                        console.error("Erro ao processar dados:", error);
+                        // Em caso de erro, usar valores padrão
+                        $("#nome").text("Teste");
+                        $("#convidados").text("Teste");
+                        $("#data").text("Teste");
+                        $("#local").text("Teste");
+                        $("#total").text("Total: R$ 0,00");
+                        
+                        // Adicionar item de teste
+                        var t = $('<tr>' +
+                            '<td style="padding: 10px; font-size: 22px;">Teste</td>' +
+                            '<td style="text-align: center; padding: 10px; font-size: 22px;">1</td>' +
+                            '<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>' +
+                            '<td style="text-align: center; padding: 10px; font-size: 22px;">100,00</td>' +
+                        '</tr>');
+                        $("#tabela").append(t);
+                    }
+                    
+                    window.jsPDF = window.jspdf.jsPDF;
+                    capture();
+                });
+
+                function getUrlParam(name) {
+                    try {
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var param = urlParams.get(name);
+                        
+                        if (param === null) {
+                            return null;
+                        }
+                        
+                        // Tentar decodificar de forma segura
+                        try {
+                            return decodeURIComponent(param);
+                        } catch (e) {
+                            console.warn("Erro ao decodificar parâmetro " + name + ":", e);
+                            // Se falhar, tentar sem decodificação
+                            return param;
+                        }
+                    } catch (error) {
+                        console.error("Erro ao obter parâmetro " + name + ":", error);
+                        return null;
+                    }
+                }
 		
 		
 		
