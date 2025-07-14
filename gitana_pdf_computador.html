@@ -22,10 +22,10 @@
                         console.log("Total:", total);
                         
                         // Definir valores padrão caso os dados não existam
-                        $("#nome").text(pedido && pedido.nome ? pedido.nome : "Cliente Teste");
-                        $("#convidados").text(pedido && pedido.convidados ? pedido.convidados : "50");
-                        $("#data").text(pedido && pedido.data ? pedido.data+"h" : "01/01/2025 - 18:00");
-                        $("#local").text(pedido && pedido.local ? pedido.local : "Local do Evento");
+                        $("#nome").text(pedido && pedido.nome ? pedido.nome : "#");
+                        $("#convidados").text(pedido && pedido.convidados ? pedido.convidados : "#");
+                        $("#data").text(pedido && pedido.data ? pedido.data+"h" : "#");
+                        $("#local").text(pedido && pedido.local ? pedido.local : "#");
                         $("#total").text("Total: R$ " + total);
                         
                         // Se não há itens, adicionar item de teste

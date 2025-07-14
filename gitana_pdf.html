@@ -145,10 +145,10 @@
                 console.log("Total:", total);
                 
                 // Definir valores padrão caso os dados não existam
-                $("#nome").text(pedido && pedido[0] && pedido[0].nome ? pedido[0].nome : "Cliente Teste");
-                $("#convidados").text(pedido && pedido[1] && pedido[1].convidados ? pedido[1].convidados : "50");
-                $("#data").text(pedido && pedido[3] && pedido[3].data ? pedido[3].data+"h" : "01/01/2025 - 18:00");
-                $("#local").text(pedido && pedido[2] && pedido[2].local ? pedido[2].local : "Local do Evento");
+                $("#nome").text(pedido && pedido.nome ? pedido.nome : "#");
+                $("#convidados").text(pedido && pedido.convidados ? pedido.convidados : "#");
+                $("#data").text(pedido && pedido.data ? pedido.data+"h" : "#");
+                $("#local").text(pedido && pedido.local ? pedido.local : "#");
                 $("#total").text("Total: R$ " + total);
                 
                 // Se não há itens, adicionar item de teste
@@ -194,26 +194,7 @@
                 // Mostrar mensagem de erro na interface
                 $(".error-message").show().text("Erro ao carregar dados: " + error.message);
                 
-                // Em caso de erro, usar valores padrão
-                $("#nome").text("Cliente Teste");
-                $("#convidados").text("50");
-                $("#data").text("01/01/2025 - 18:00");
-                $("#local").text("Local do Evento");
-                $("#total").text("Total: R$ 0,00");
-                
-                // Adicionar item de teste
-                var descricaoRow = $('<tr>' +
-                    '<td class="product-description" colspan="3">Item de Teste</td>' +
-                '</tr>');
-                
-                var detalhesRow = $('<tr>' +
-                    '<td class="product-details" style="text-align: center;"><strong>QTD:</strong> 1</td>' +
-                    '<td class="product-details" style="text-align: center;"><strong>VALOR:</strong> R$ 100,00</td>' +
-                    '<td class="product-details" style="text-align: center;"><strong>TOTAL:</strong> R$ 100,00</td>' +
-                '</tr>');
-                
-                $("#tabela").append(descricaoRow);
-                $("#tabela").append(detalhesRow);
+             
             }
             
             window.jsPDF = window.jspdf.jsPDF;
