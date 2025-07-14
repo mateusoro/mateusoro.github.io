@@ -76,28 +76,28 @@
                     capture();
                 });
 
-                function getUrlParam(name) {
-                    try {
-                        var urlParams = new URLSearchParams(window.location.search);
-                        var param = urlParams.get(name);
-                        
-                        if (param === null) {
-                            return null;
-                        }
-                        
-                        // Tentar decodificar de forma segura
-                        try {
-                            return decodeURIComponent(param);
-                        } catch (e) {
-                            console.warn("Erro ao decodificar parâmetro " + name + ":", e);
-                            // Se falhar, tentar sem decodificação
-                            return param;
-                        }
-                    } catch (error) {
-                        console.error("Erro ao obter parâmetro " + name + ":", error);
-                        return null;
-                    }
+        function getUrlParam(name) {
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                var param = urlParams.get(name);
+                
+                if (param === null) {
+                    return null;
                 }
+                
+                // Tentar decodificar de forma segura
+                try {
+                    return decodeURIComponent(param);
+                } catch (e) {
+                    console.warn("Erro ao decodificar parâmetro " + name + ":", e);
+                    // Se falhar, tentar sem decodificação
+                    return param;
+                }
+            } catch (error) {
+                console.error("Erro ao obter parâmetro " + name + ":", error);
+                return null;
+            }
+        }
 		
 		
 		
